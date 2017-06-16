@@ -32,6 +32,7 @@
     <Compile Include="Services\Calculation.cs" />
     <Compile Include="ViewModels\TipViewModel.cs" />
     <Compile Include="App.cs" />
+    <Compile Include="ViewModels\PayViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="MvvmCross.Platform">

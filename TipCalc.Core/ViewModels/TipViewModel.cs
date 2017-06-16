@@ -1,4 +1,6 @@
-﻿using MvvmCross.Core.ViewModels;
+﻿using System.Collections.Generic;
+using System.Windows.Input;
+using MvvmCross.Core.ViewModels;
 using TipCalc.Core.Services;
 
 namespace TipCalc.Core.ViewModels
@@ -19,6 +21,17 @@ namespace TipCalc.Core.ViewModels
 			Recalculate();
 			base.Start();
 		}
+
+        public ICommand PayComamnd
+        {
+            get
+            {
+                return new MvxCommand(() => ShowViewModel<PayViewModel>(new Dictionary<string, string>()
+                {
+                    {"total", (Tip + SubTotal).ToString()}
+                }));
+            }
+        }
 
 		double _subTotal;
 
@@ -72,4 +85,5 @@ namespace TipCalc.Core.ViewModels
 			Tip = _calculation.TipAmount(SubTotal, Generosity);
 		}
 	}
+
 }
