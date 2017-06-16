@@ -66,6 +66,8 @@
     <Compile Include="TipServiceTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TipViewModelTests.cs" />
+    <Compile Include="MockDispatcher.cs" />
+    <Compile Include="ViewModelTestsBase.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

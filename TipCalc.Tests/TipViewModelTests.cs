@@ -11,32 +11,15 @@ using TipCalc.Core.Services;
 
 namespace TipCalc.Tests
 {
-    public class MockDispatcher : MvxMainThreadDispatcher, IMvxViewDispatcher
-	{
-		public readonly List<MvxViewModelRequest> Requests = new List<MvxViewModelRequest>();
-		public readonly List<MvxPresentationHint> Hints = new List<MvxPresentationHint>();
-
-		public bool RequestMainThreadAction(Action action)
-		{
-			action();
-			return true;
-		}
-
-        public bool ShowViewModel(MvxViewModelRequest request)
+    [TestFixture]
+    public class TipViewModelTests: ViewModelTestsBase
+    {
+        [SetUp]
+        public void Init()
         {
-            Requests.Add((request));
-            return true;
+            Setup();            
         }
 
-		public bool ChangePresentation(MvxPresentationHint hint)
-		{
-			throw new NotImplementedException();
-		}
-	}
-
-	[TestFixture]
-    public class TipViewModelTests: MvxIoCSupportingTest
-    {
         [Test]
         public void TestThatWhenSubTotalChangesTipIsRecalculated()
         {
@@ -45,10 +28,12 @@ namespace TipCalc.Tests
             var mockTipService = new Mock<ICalculation>();
             mockTipService.Setup(t => t.TipAmount(It.IsAny<double>(), It.IsAny<int>()))
                           .Returns(42.0);
-            var tipViewModel = new TipViewModel(mockTipService.Object);
 
             //Act
-            tipViewModel.SubTotal = 12;
+            var tipViewModel = new TipViewModel(mockTipService.Object)
+            {
+                SubTotal = 12
+            };
 
             //Assert
             Assert.AreEqual(42.0, tipViewModel.Tip);
@@ -58,33 +43,29 @@ namespace TipCalc.Tests
 		public void TestThatWhenGenerosityChangesTipIsRecalculated()
 		{
 			//Arrange
-			base.ClearAll();
 			var mockTipService = new Mock<ICalculation>();
 			mockTipService.Setup(t => t.TipAmount(It.IsAny<double>(), It.IsAny<int>()))
 						  .Returns(37.0);
-			var tipViewModel = new TipViewModel(mockTipService.Object);
 
-			//Act
-            tipViewModel.Generosity = 12;
+            //Act
+            var tipViewModel = new TipViewModel(mockTipService.Object)
+            {
+                Generosity = 12
+            };
 
-			//Assert
-			Assert.AreEqual(37.0, tipViewModel.Tip);
+            //Assert
+            Assert.AreEqual(37.0, tipViewModel.Tip);
 		}
 
 		[Test]
 		public void TestThatWhenTipIsRecalculatedThenTipNotificationIsSent()
 		{
 			//Arrange
-			base.ClearAll();
 			var mockTipService = new Mock<ICalculation>();
 			mockTipService.Setup(t => t.TipAmount(It.IsAny<double>(), It.IsAny<int>()))
 						  .Returns(37.0);
 
-            var mockDispatcher = new MockDispatcher();
-            Ioc.RegisterSingleton<IMvxViewDispatcher>(mockDispatcher);
-            Ioc.RegisterSingleton<IMvxMainThreadDispatcher>(mockDispatcher);
-
-			var tipViewModel = new TipViewModel(mockTipService.Object);
+            var tipViewModel = new TipViewModel(mockTipService.Object);
 
             var tipChangeCount = 0;
 			var generosityChangeCount = 0;
@@ -119,16 +100,11 @@ namespace TipCalc.Tests
 		public void TestThatPayCommandShowsPayViewModelWithCorrectTotal()
 		{
 			//Arrange
-			base.ClearAll();
 			var mockTipService = new Mock<ICalculation>();
 			mockTipService.Setup(t => t.TipAmount(It.IsAny<double>(), It.IsAny<int>()))
 						  .Returns(19);
 
-			var mockDispatcher = new MockDispatcher();
-			Ioc.RegisterSingleton<IMvxViewDispatcher>(mockDispatcher);
-			Ioc.RegisterSingleton<IMvxMainThreadDispatcher>(mockDispatcher);
-
-            var tipViewModel = new TipViewModel(mockTipService.Object)
+			var tipViewModel = new TipViewModel(mockTipService.Object)
             {
                 Generosity = 12,
                 SubTotal = 10
@@ -138,8 +114,8 @@ namespace TipCalc.Tests
             tipViewModel.PayComamnd.Execute(null);
 
 			//Assert
-            Assert.AreEqual(1, mockDispatcher.Requests.Count);
-            var request = mockDispatcher.Requests[0];
+            Assert.AreEqual(1, MockDispatcher.Requests.Count);
+            var request = MockDispatcher.Requests[0];
             Assert.AreEqual(typeof(PayViewModel),request.ViewModelType);
             Assert.AreEqual("29",request.ParameterValues["total"]);
 		}

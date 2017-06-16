@@ -19,17 +19,19 @@ namespace TipCalc.Tests
             Assert.AreEqual(0, result);
         }
 
-		[Test]
-		public void TestThatTenGenerosityReturnsTenTip()
+        [TestCase(10.25, 10)]
+		[TestCase(10.25, 15)]
+		[TestCase(10.25, 20)]
+		public void TestThatTenGenerosityReturnsTenTip(double subTotal, int generosity )
 		{
 			//Arrange
 			var tip = new Calculation();
 
 			//Act
-			var result = tip.TipAmount(42.35, 10);
+			var result = tip.TipAmount(subTotal, generosity);
 
-			//Assert
-			Assert.AreEqual(4.235, result);
+            //Assert
+            Assert.AreEqual(subTotal * generosity / 100.0, result);
 		}
 
     }
